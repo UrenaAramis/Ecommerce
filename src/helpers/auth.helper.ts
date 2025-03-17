@@ -36,8 +36,9 @@ export async function register(userData: IRegisterProps) {
     const data = await response.json();
     showAlert("Success", "User registered successfully", "success");
     return data;
-  } catch (error: any) {
-    showAlert("Error", `Failed to register: ${error.message}`, "error");
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+    showAlert("Error", `Failed to register: ${errorMessage}`, "error");
     throw error;
   }
 }
@@ -58,8 +59,9 @@ export async function login(userData: ILoginProps) {
     const data = await response.json();
     showAlert("Success", "User logged in successfully", "success");
     return data;
-  } catch (error: any) {
-    showAlert("Error", `Failed to log in: The user or password is incorrect.`, "error");
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+    showAlert("Error", `Failed to log in: ${errorMessage}`, "error");
     throw error;
   }
 }

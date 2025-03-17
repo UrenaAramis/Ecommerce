@@ -32,10 +32,11 @@ export async function createOrder(token: string, products: number[]) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Error creating order");
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
     Swal.fire({
       title: "Error",
-      text: "There was an issue creating the order. Please try again later.",
+      text: `There was an issue creating the order: ${errorMessage}`,
       icon: "error",
       confirmButtonText: "OK",
       customClass: {
@@ -45,7 +46,7 @@ export async function createOrder(token: string, products: number[]) {
           "bg-gray-700 hover:bg-gray-600 text-white rounded-xl px-4 py-2",
       },
     });
-    throw new Error(error);
+    throw error;
   }
 }
 
@@ -65,10 +66,11 @@ export async function getOrders(token: string) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Error fetching orders");
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
     Swal.fire({
       title: "Error",
-      text: "An error occurred while fetching orders. Please try again later.",
+      text: `An error occurred while fetching orders: ${errorMessage}`,
       icon: "error",
       confirmButtonText: "OK",
       customClass: {
@@ -78,6 +80,6 @@ export async function getOrders(token: string) {
           "bg-gray-700 hover:bg-gray-600 text-white rounded-xl px-4 py-2",
       },
     });
-    throw new Error(error);
+    throw error;
   }
 }

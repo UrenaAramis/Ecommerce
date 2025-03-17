@@ -9,17 +9,22 @@ const OrdersView = () => {
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const handleGetOrders = async () => {
-    const response = await getOrders(userData?.token!);
-    setOrders(response);
-    setLoading(false);
-  };
-
   useEffect(() => {
-    if (userData?.token) {
-      handleGetOrders();
-    }
-  }, [userData]);
+    const handleGetOrders = async () => {
+      if (!userData?.token) return;
+
+      try {
+        const response = await getOrders(userData.token);
+        setOrders(response);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    handleGetOrders();
+  }, [userData?.token]); 
 
   return (
     <div className="p-6">
@@ -33,9 +38,9 @@ const OrdersView = () => {
         </p>
       ) : orders.length ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-
           {orders.map((order) => {
-            let total = 0;
+            const total = order.products.reduce((sum, product) => sum + product.price, 0);
+
             return (
               <div
                 key={order.id}
@@ -52,17 +57,14 @@ const OrdersView = () => {
                 </p>
 
                 <div className="mt-4 space-y-2 border-t border-gray-200 pt-3">
-                  {order.products.map((product) => {
-                    total += product.price;
-                    return (
-                      <div key={product.id} className="flex justify-between text-sm text-gray-700">
-                        <span className="pr-2">{product.name}</span>
-                        <span className="font-semibold">${product.price.toFixed(2)}</span>
-                      </div>
-                    );
-                  })}
+                  {order.products.map((product) => (
+                    <div key={product.id} className="flex justify-between text-sm text-gray-700">
+                      <span className="pr-2">{product.name}</span>
+                      <span className="font-semibold">${product.price.toFixed(2)}</span>
+                    </div>
+                  ))}
                 </div>
-                
+
                 <p className="text-right text-gray-800 font-bold mt-3 border-t border-gray-200 pt-3">
                   Total: ${total.toFixed(2)}
                 </p>
@@ -72,10 +74,9 @@ const OrdersView = () => {
         </div>
       ) : (
         <div className="bg-white flex flex-row gap-6 items-center p-8 border border-gray-100 shadow-md rounded-2xl">
-        <p className="text-gray-600 text-lg font-light text-center">
-          You don't have any orders yet.
-          
-        </p>
+          <p className="text-gray-600 text-lg font-light text-center">
+            You don&apos;t have any orders yet.
+          </p>
         </div>
       )}
     </div>

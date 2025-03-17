@@ -3,44 +3,48 @@ import { notFound } from "next/navigation";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function getProductsDB() {
+export async function getProductsDB(): Promise<IProduct[]> {
   try {
     const response = await fetch(`${API_URL}/products`, {
       next: { revalidate: 1200 },
     });
 
-    const products: IProduct[] = await response.json();
-    return products;
-  } catch (error: any) {
-    throw new Error(error);
+    if (!response.ok) {
+      throw new Error("Failed to fetch products");
+    }
+
+    return await response.json();
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+    throw new Error(errorMessage);
   }
 }
 
-export async function getProductsById(id: string) {
+export async function getProductsById(id: string): Promise<IProduct | undefined> {
   try {
     const products = await getProductsDB();
     const foundProduct = products.find((product) => product.id.toString() === id);
     
     if (!foundProduct) {
-      notFound()
+      notFound();
     }
 
     return foundProduct;
-  } catch (error: any) {
-    notFound()
+  } catch {
+    notFound();
   }
 }
 
-export async function getProductsByCategoryId(categoryId: string) {
+export async function getProductsByCategoryId(categoryId: string): Promise<IProduct[]> {
   try {
-    const products: IProduct[] = await getProductsDB();
-    let productsFiltered: IProduct[] = products.filter((product) => product.categoryId.toString() === categoryId);
-    
-    return productsFiltered;
-  } catch (error: any) {
-    throw new Error(error);
+    const products = await getProductsDB();
+    return products.filter((product) => product.categoryId.toString() === categoryId);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+    throw new Error(errorMessage);
   }
 }
+
 
 // export async function getFirstProductName(){
 //   try {

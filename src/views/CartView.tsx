@@ -13,20 +13,30 @@ const CartView = () => {
   const [total, setTotal] = useState<number>(0);
 
   useEffect(() => {
-    const storedCart: IProduct[] = JSON.parse(
-      localStorage.getItem("cart") || "[]"
-    );
-    if (storedCart) {
-      let totalCart = 0;
-      storedCart.forEach((product) => {
-        totalCart += product.price;
-      });
-      setTotal(totalCart);
+    const storedCart: IProduct[] = JSON.parse(localStorage.getItem("cart") || "[]");
+    if (storedCart.length > 0) {
       setCart(storedCart);
+      setTotal(storedCart.reduce((acc, product) => acc + product.price, 0));
     }
   }, []);
 
   const handleCheckout = async () => {
+    if (!userData?.token) {
+      Swal.fire({
+        title: "Authentication Required",
+        text: "Please log in to proceed with the checkout.",
+        icon: "warning",
+        confirmButtonText: "OK",
+        customClass: {
+          popup: "bg-black text-white rounded-xl shadow-lg",
+          title: "text-lg font-bold text-white",
+          confirmButton:
+            "bg-gray-700 hover:bg-gray-600 text-white rounded-xl px-4 py-2",
+        },
+      });
+      return;
+    }
+
     if (cart.length === 0) {
       Swal.fire({
         title: "Your cart is empty",
@@ -42,9 +52,10 @@ const CartView = () => {
       });
       return;
     }
+
     Swal.fire({
       title: "Are you sure you want to checkout?",
-      text: "You can still add products to your cart",
+      text: "You can still add products to your cart.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, Checkout",
@@ -60,7 +71,7 @@ const CartView = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         const idProducts = cart.map((product) => product.id);
-        await createOrder(userData?.token!, idProducts);
+        await createOrder(userData.token, idProducts);
         localStorage.setItem("cart", "[]");
         setCart([]);
         setTotal(0);
@@ -88,13 +99,7 @@ const CartView = () => {
         const updatedCart = cart.filter((product) => product.id !== id);
         localStorage.setItem("cart", JSON.stringify(updatedCart));
         setCart(updatedCart);
-
-        let newTotal = 0;
-        updatedCart.map((product) => {
-          newTotal += product.price;
-        });
-
-        setTotal(newTotal);
+        setTotal(updatedCart.reduce((acc, product) => acc + product.price, 0));
 
         Swal.fire({
           title: "Removed",
@@ -117,10 +122,7 @@ const CartView = () => {
       <div className="flex flex-col w-full max-w-lg gap-4">
         {cart.length ? (
           cart.map((product) => (
-            <div
-              key={product.id}
-              className="flex justify-between items-center p-4 bg-white border rounded-2xl gap-4"
-            >
+            <div key={product.id} className="flex justify-between items-center p-4 bg-white border rounded-2xl gap-4">
               <img src={product.image} alt={product.name} className="w-20 h-23" />
               <p className="text-gray-800 font-medium">{product.name}</p>
               <p className="text-gray-700 font-semibold">${product.price}</p>
@@ -134,7 +136,7 @@ const CartView = () => {
           ))
         ) : (
           <p className="text-gray-600 text-lg font-light text-center">
-            You don't have products added to your cart yet 😔
+            You don&apos;t have products added to your cart yet 😔
           </p>
         )}
       </div>
