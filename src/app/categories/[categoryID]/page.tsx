@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // Use the correct Page component structure
-export default async function Page({ params, searchParams }: Props) {
+export default async function Page({ params }: Props) {
   const products = await getProductsByCategoryId(params.categoryID);
 
   return (
