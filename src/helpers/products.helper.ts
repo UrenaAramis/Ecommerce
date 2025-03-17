@@ -1,5 +1,5 @@
 import { IProduct } from "@/types";
-import { notFound } from "next/navigation"; 
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -26,13 +26,15 @@ export async function getProductsById(id: string): Promise<IProduct> {
     const foundProduct = products.find((product) => product.id.toString() === id);
     
     if (!foundProduct) {
-      notFound();
+      throw new Error(`Product with ID ${id} not found`);
     }
 
     return foundProduct;
-  } catch {
-    notFound();
-    
+  } catch (error) {
+    console.error("Error in getProductsById:", error);
+   
+    // TypeScript necesita un valor de retorno, aunque nunca llegará aquí
+    throw error; // Alternativa a return {} as IProduct;
   }
 }
 
