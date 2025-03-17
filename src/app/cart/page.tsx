@@ -1,6 +1,6 @@
 import CartView from "@/views/CartView";
 
-export const Cart = () => {
+const Cart = () => {
   return <CartView />;
 };
 
