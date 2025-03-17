@@ -9,14 +9,19 @@ export async function getProductsDB(): Promise<IProduct[]> {
       next: { revalidate: 1200 },
     });
 
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error("Invalid JSON response");
+    }
+
     if (!response.ok) {
-      throw new Error("Failed to fetch products");
+      throw new Error(`API responded with status ${response.status}`);
     }
 
     return await response.json();
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-    throw new Error(errorMessage);
+    console.error("Error fetching products:", error);
+    return []; // Devuelve un array vacío en caso de error
   }
 }
 

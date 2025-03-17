@@ -1,4 +1,6 @@
 
+"use client";
+
 import Card from "@/components/Card"
 import { getProductsDB } from "@/helpers/products.helper";
 import Link from "next/link"
