@@ -20,7 +20,7 @@ export async function getProductsDB(): Promise<IProduct[]> {
   }
 }
 
-export async function getProductsById(id: string): Promise<IProduct | undefined> {
+export async function getProductsById(id: string): Promise<IProduct> {
   try {
     const products = await getProductsDB();
     const foundProduct = products.find((product) => product.id.toString() === id);
@@ -32,6 +32,7 @@ export async function getProductsById(id: string): Promise<IProduct | undefined>
     return foundProduct;
   } catch {
     notFound();
+    
   }
 }
 

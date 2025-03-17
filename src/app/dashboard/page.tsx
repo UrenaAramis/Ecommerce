@@ -1,7 +1,7 @@
 import ProfileView from "@/views/profileView";
 import React from "react";
 
-export const Dashboard = () => {
+ const Dashboard = () => {
 
 
   return (
